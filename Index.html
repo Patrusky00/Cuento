@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Aventura de Darek</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #7e22ce);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 30px;
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        
+        h1 { text-align: center; color: #dc2626; font-size: 2.5em; margin-bottom: 10px; }
+        h2 { text-align: center; color: #15803d; font-size: 1.4em; margin-bottom: 30px; }
+        
+        .page-num { text-align: center; color: #7c3aed; font-size: 1.2em; margin-bottom: 20px; font-weight: bold; }
+        
+        .scene {
+            width: 100%;
+            height: 350px;
+            border-radius: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #fbbf24;
+        }
+        
+        .scene-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        
+        .emoji {
+            position: absolute;
+            user-select: none;
+        }
+        
+        .float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        
+        .sparkle { animation: sparkle 2s ease-in-out infinite; }
+        @keyframes sparkle { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        
+        .text {
+            font-size: 1.5em;
+            line-height: 1.8;
+            color: #1f2937;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .highlight { color: #dc2626; font-weight: bold; }
+        .magic { color: #7c3aed; font-weight: bold; }
+        
+        button {
+            padding: 20px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            margin: 10px;
+        }
+        
+        .nav-btns { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+        .btn-prev { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: white; }
+        .btn-next { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; }
+        .btn-choice { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; width: 100%; margin: 10px 0; }
+        
+        button:hover { transform: scale(1.05); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .audio-btn {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+            color: white;
+            display: block;
+            margin: 20px auto;
+        }
+        
+        .game {
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(180deg, #1e3a8a, #3b82f6);
+            border-radius: 20px;
+            margin: 20px 0;
+            position: relative;
+            border: 5px solid #fbbf24;
+        }
+        
+        .game-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #dc2626;
+            z-index: 10;
+        }
+        
+        .bell {
+            position: absolute;
+            font-size: 45px;
+            cursor: pointer;
+        }
+        
+        .bell:hover { transform: scale(1.2); }
+        .bell.found { pointer-events: none; }
+        
+        .circle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #dc2626;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .piece {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            cursor: pointer;
+            position: relative;
+            border: 4px solid transparent;
+        }
+        
+        .piece:hover { transform: scale(1.05); }
+        .piece.ok { border-color: #15803d; }
+        
+        .num {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+        
+        .msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #15803d;
+            z-index: 20;
+        }
+        
+        .carol {
+            background: linear-gradient(135deg, #dc2626, #16a34a);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 5px solid #fbbf24;
+        }
+        
+        .carol h3 {
+            text-align: center;
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        
+        .carol-text {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.2em;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .carol-text p { margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎄 La Aventura Mágica 🎄</h1>
+        <h2>de <span class="highlight">Darek</span> y <span class="highlight">Conan</span></h2>
+        
+        <button class="audio-btn" onclick="speak()" id="audio">🔊 Escuchar</button>
+        
+        <div class="page-num" id="pageNum"></div>
+        <div id="content"></div>
+    </div>
+    
+    <script>
+        let page = 1;
+        let path = null;
+        let bellCount = 0;
+        let puzzleCount = 0;
+        
+        const pages = [
+            null,
+            {t:'Era Nochebuena y <span class="highlight">Darek</span> miraba por la ventana con su perrito <span class="highlight">Conan</span>. Las estrellas brillaban en el cielo oscuro.',bg:'#0f172a',e:[{i:'🏠',x:40,y:30,s:120},{i:'👦',x:30,y:45,s:80,f:1},{i:'🐕',x:55,y:55,s:60,f:1},{i:'🌙',x:70,y:10,s:60,p:1},{i:'⭐',x:20,y:15,s:40,p:1}]},
+            {t:'<span class="highlight">Darek</span> pensaba en todos sus amigos del cole nuevo y en la magia de la Navidad. ¡Qué emocionante!',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'🎄',x:30,y:40,s:100},{i:'👦',x:60,y:50,s:80,f:1},{i:'🎁',x:25,y:70,s:50},{i:'💫',x:60,y:15,s:50,p:1}]},
+            {t:'De repente, <span class="highlight">Conan</span> comenzó a ladrar: "¡Guau, guau!" Algo <span class="magic">mágico</span> estaba pasando...',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'🐕',x:40,y:50,s:90,f:1},{i:'👦',x:60,y:50,s:80,f:1},{i:'✨',x:30,y:15,s:50,p:1},{i:'✨',x:70,y:20,s:45,p:1}]},
+            {t:'¡Los coches Hot Wheels de <span class="highlight">Darek</span> empezaron a <span class="magic">brillar</span> con luz dorada! Nunca había visto algo así.',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'🚗',x:45,y:50,s:100,f:1},{i:'👦',x:25,y:55,s:70,f:1},{i:'✨',x:25,y:20,s:45,p:1},{i:'🌟',x:30,y:65,s:40,p:1}]},
+            {t:'Un cochecito rojo voló hacia <span class="highlight">Darek</span> y una voz suave le dijo: "¡Sube! Hay una <span class="magic">misión especial</span> para ti esta Navidad."',bg:'#0f172a',e:[{i:'🏎️',x:40,y:45,s:100,f:1},{i:'👦',x:30,y:48,s:60,f:1},{i:'🐕',x:50,y:52,s:50,f:1},{i:'☁️',x:15,y:20,s:60},{i:'⭐',x:50,y:10,s:35,p:1}]},
+            {t:'<span class="highlight">Darek</span> y <span class="highlight">Conan</span> subieron al coche mágico. ¡Comenzaron a volar por el cielo! Las nubes hacían cosquillas en sus caras.',bg:'linear-gradient(180deg,#fef3c7,#fde68a,#fcd34d)',e:[{i:'🏎️',x:45,y:45,s:90,f:1},{i:'👦',x:40,y:48,s:55,f:1},{i:'🐕',x:52,y:52,s:45,f:1},{i:'☁️',x:20,y:25,s:70},{i:'☁️',x:65,y:35,s:65},{i:'🌈',x:50,y:15,s:80}]},
+            {t:'Llegaron al Polo Norte y vieron algo triste. Papá Noel estaba preocupado. "¡Oh no! Se han <span class="magic">perdido</span> todos los cascabeles mágicos. Sin ellos, los renos no pueden volar."<br><br>¿Qué hará <span class="highlight">Darek</span>?',bg:'linear-gradient(180deg,#e0f2fe,#bae6fd,#7dd3fc)',e:[{i:'🎅',x:45,y:45,s:100,f:1},{i:'👦',x:25,y:50,s:70,f:1},{i:'🐕',x:65,y:55,s:60,f:1},{i:'🏔️',x:20,y:60,s:90},{i:'❄️',x:25,y:15,s:40,p:1}],c:1}
+        ];
+        
+        const pathA = [
+            null,null,null,null,null,null,null,null,
+            {g:'bells',t:'¡Ayuda a <span class="highlight">Darek</span> a encontrar los 5 cascabeles escondidos en el pueblo de Papá Noel! <span class="magic">Toca cada cascabel</span> cuando lo encuentres.'},
+            {t:'"¡Lo lograste!" dijo un osito polar. "¡Encontraste todos los cascabeles! Ahora brillan con <span class="magic">magia especial</span>."',bg:'linear-gradient(180deg,#e0f2fe,#bae6fd,#7dd3fc)',e:[{i:'🐻‍❄️',x:50,y:50,s:100,f:1},{i:'👦',x:25,y:55,s:70,f:1},{i:'🐕',x:70,y:60,s:60,f:1},{i:'🔔',x:60,y:35,s:50,p:1}]},
+            {t:'<span class="highlight">Darek</span> recogió los cascabeles con cuidado. Cada uno hacía un sonido diferente: "¡Tilín, tolón, talán!"',bg:'linear-gradient(180deg,#e0f2fe,#bae6fd,#7dd3fc)',e:[{i:'👦',x:30,y:50,s:80,f:1},{i:'🐕',x:65,y:55,s:65,f:1},{i:'🏔️',x:50,y:60,s:120},{i:'✨',x:40,y:30,s:40,p:1},{i:'🔔',x:48,y:45,s:45,p:1}]},
+            {t:'Los cascabeles comenzaron a <span class="magic">brillar</span> más y más. ¡La magia de <span class="highlight">Darek</span> los había despertado!',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'👦',x:45,y:65,s:80,f:1},{i:'🔔',x:45,y:35,s:80,p:1},{i:'💫',x:30,y:20,s:45,p:1},{i:'🎶',x:35,y:55,s:50}]},
+            {t:'Corrieron con Papá Noel. Los renos recibieron sus cascabeles y comenzaron a <span class="magic">brillar</span> con magia.',bg:'linear-gradient(180deg,#dc2626,#ef4444,#f87171)',e:[{i:'🦌',x:50,y:30,s:90,f:1},{i:'👦',x:30,y:65,s:70,f:1},{i:'🐕',x:60,y:70,s:60,f:1},{i:'🏠',x:45,y:55,s:110},{i:'✨',x:30,y:20,s:40,p:1},{i:'🔔',x:25,y:35,s:45,p:1}]},
+            {t:'"¡Gracias, <span class="highlight">Darek</span>!" dijo Papá Noel con una gran sonrisa. "¡Has salvado la Navidad! Eres muy <span class="magic">valiente</span>."',bg:'linear-gradient(180deg,#dc2626,#ef4444,#f87171)',e:[{i:'🎅',x:35,y:40,s:100,f:1},{i:'👦',x:60,y:50,s:75,f:1},{i:'🐕',x:20,y:55,s:60,f:1},{i:'🏠',x:60,y:55,s:100},{i:'🎁',x:25,y:70,s:50},{i:'⭐',x:50,y:15,s:50,p:1}]},
+            {t:'Papá Noel le regaló a <span class="highlight">Darek</span> un Hot Wheels especial que <span class="magic">brillaba</span> en la oscuridad. "Este coche es mágico, como tú."',bg:'#0f172a',e:[{i:'🏎️',x:40,y:55,s:100,f:1},{i:'👦',x:35,y:58,s:70,f:1},{i:'🎅',x:60,y:60,s:80,f:1},{i:'⭐',x:25,y:15,s:40,p:1},{i:'🌟',x:45,y:40,s:60,p:1}]},
+            {t:'<span class="highlight">Darek</span> y <span class="highlight">Conan</span> volvieron a casa. Había sido la aventura más <span class="magic">emocionante</span> de su vida. ¡La Navidad es <span class="magic">mágica</span> de verdad!<br><br><span class="highlight">🎄 FIN 🎄</span>',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'👦',x:40,y:55,s:80,f:1},{i:'🐕',x:55,y:60,s:65,f:1},{i:'🏠',x:45,y:45,s:120},{i:'❤️',x:35,y:25,s:50,p:1},{i:'✨',x:50,y:15,s:50,p:1},{i:'🎄',x:20,y:65,s:60},{i:'🎄',x:75,y:70,s:55}],carol:1}
+        ];
+        
+        const pathB = [
+            null,null,null,null,null,null,null,null,
+            {g:'puzzle',t:'¡Ayuda a <span class="highlight">Darek</span> a completar el puzzle del cascabel! <span class="magic">Toca cada pieza</span> en orden: 1, 2, 3, 4.'},
+            {t:'"¡Increíble!" dijeron los duendes. "¡Completaste el cascabel mágico! Ahora <span class="magic">brilla</span> con tu magia."',bg:'linear-gradient(180deg,#e0f2fe,#bae6fd,#7dd3fc)',e:[{i:'🐻‍❄️',x:50,y:50,s:100,f:1},{i:'👦',x:25,y:55,s:70,f:1},{i:'🐕',x:70,y:60,s:60,f:1},{i:'🔔',x:60,y:35,s:50,p:1}]},
+            {t:'<span class="highlight">Darek</span> pintó más cascabeles de colores <span class="magic">brillantes</span>: rojo, azul, verde y dorado. ¡Todos hermosos!',bg:'linear-gradient(180deg,#e0f2fe,#bae6fd,#7dd3fc)',e:[{i:'👦',x:30,y:50,s:80,f:1},{i:'🐕',x:65,y:55,s:65,f:1},{i:'🏔️',x:50,y:60,s:120},{i:'✨',x:40,y:30,s:40,p:1},{i:'🔔',x:48,y:45,s:45,p:1}]},
+            {t:'Cuando terminó, algo <span class="magic">mágico</span> pasó. Los cascabeles comenzaron a brillar y hacer música: "¡Tilín, tilín, tilín!"',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'👦',x:45,y:65,s:80,f:1},{i:'🔔',x:45,y:35,s:80,p:1},{i:'💫',x:30,y:20,s:45,p:1},{i:'🎶',x:35,y:55,s:50}]},
+            {t:'Los renos recibieron los cascabeles nuevos. ¡Empezaron a <span class="magic">volar</span> más alto que nunca! Los cascabeles de <span class="highlight">Darek</span> eran especiales.',bg:'linear-gradient(180deg,#dc2626,#ef4444,#f87171)',e:[{i:'🦌',x:50,y:30,s:90,f:1},{i:'👦',x:30,y:65,s:70,f:1},{i:'🐕',x:60,y:70,s:60,f:1},{i:'🏠',x:45,y:55,s:110},{i:'✨',x:30,y:20,s:40,p:1},{i:'🔔',x:25,y:35,s:45,p:1}]},
+            {t:'"¡Eres un <span class="magic">artista</span> increíble, <span class="highlight">Darek</span>!" dijo Papá Noel. "¡Has salvado la Navidad con tu creatividad!"',bg:'linear-gradient(180deg,#dc2626,#ef4444,#f87171)',e:[{i:'🎅',x:35,y:40,s:100,f:1},{i:'👦',x:60,y:50,s:75,f:1},{i:'🐕',x:20,y:55,s:60,f:1},{i:'🏠',x:60,y:55,s:100},{i:'🎁',x:25,y:70,s:50},{i:'⭐',x:50,y:15,s:50,p:1}]},
+            {t:'Papá Noel le regaló un Hot Wheels especial que cambiaba de color. "Este coche es tan <span class="magic">especial</span> como tú."',bg:'#0f172a',e:[{i:'🏎️',x:40,y:55,s:100,f:1},{i:'👦',x:35,y:58,s:70,f:1},{i:'🎅',x:60,y:60,s:80,f:1},{i:'⭐',x:25,y:15,s:40,p:1},{i:'🌟',x:45,y:40,s:60,p:1}]},
+            {t:'<span class="highlight">Darek</span> y <span class="highlight">Conan</span> volvieron a casa. Había sido la aventura más <span class="magic">emocionante</span> de su vida. ¡La Navidad es <span class="magic">mágica</span> de verdad!<br><br><span class="highlight">🎄 FIN 🎄</span>',bg:'linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)',e:[{i:'👦',x:40,y:55,s:80,f:1},{i:'🐕',x:55,y:60,s:65,f:1},{i:'🏠',x:45,y:45,s:120},{i:'❤️',x:35,y:25,s:50,p:1},{i:'✨',x:50,y:15,s:50,p:1},{i:'🎄',x:20,y:65,s:60},{i:'🎄',x:75,y:70,s:55}],carol:1}
+        ];
+        
+        function getData() {
+            if (page <= 7) return pages[page];
+            return path === 'A' ? pathA[page] : pathB[page];
+        }
+        
+        function show() {
+            const d = getData();
+            let html = '';
+            
+            if (d.g === 'bells') {
+                html = '<div class="text">' + d.t + '</div>' + makeBellGame();
+            } else if (d.g === 'puzzle') {
+                html = '<div class="text">' + d.t + '</div>' + makePuzzleGame();
+            } else {
+                html = makeScene(d) + '<div class="text">' + d.t + '</div>';
+                if (d.carol) html += makeCarol();
+                if (d.c) {
+                    html += '<button class="btn-choice" onclick="pickA()">🔍 Buscar los cascabeles perdidos</button>';
+                    html += '<button class="btn-choice" onclick="pickB()">🎨 Hacer cascabeles nuevos</button>';
+                } else {
+                    html += '<div class="nav-btns">';
+                    html += '<button class="btn-prev" onclick="prev()"' + (page===1?' disabled':'') + '>⬅️ Atrás</button>';
+                    html += '<button class="btn-next" onclick="next()"' + (page===15?' disabled':'') + '>' + (page===15?'🔄 Reiniciar':'Siguiente ➡️') + '</button>';
+                    html += '</div>';
+                }
+            }
+            
+            document.getElementById('content').innerHTML = html;
+            document.getElementById('pageNum').textContent = '📖 Página ' + page + ' de 15';
+        }
+        
+        function makeScene(d) {
+            let h = '<div class="scene"><div class="scene-bg" style="background:' + d.bg + '"></div>';
+            if (d.e) {
+                d.e.forEach(x => {
+                    const c = (x.f?'float ':'') + (x.p?'sparkle ':'') + 'emoji';
+                    h += '<div class="' + c + '" style="left:' + x.x + '%;top:' + x.y + '%;font-size:' + x.s + 'px">' + x.i + '</div>';
+                });
+            }
+            return h + '</div>';
+        }
+        
+        function makeBellGame() {
+            const pos = [{x:10,y:15},{x:75,y:25},{x:20,y:45},{x:70,y:60},{x:40,y:75}];
+            const dec = [{i:'🏠',x:40,y:20},{i:'🏠',x:50,y:50},{i:'🎄',x:25,y:30},{i:'🎄',x:15,y:65},{i:'🎄',x:80,y:40},{i:'🧝',x:60,y:70},{i:'🧝',x:60,y:35},{i:'⭐',x:50,y:10},{i:'💡',x:45,y:25},{i:'💡',x:35,y:55},{i:'❄️',x:85,y:15},{i:'❄️',x:25,y:80},{i:'🎁',x:70,y:85},{i:'🎁',x:5,y:40}];
+            
+            let h = '<div class="game"><div class="game-counter" id="bc">🔔 0/5</div>';
+            dec.forEach(x => h += '<div style="position:absolute;left:'+x.x+'%;top:'+x.y+'%;font-size:50px">'+x.i+'</div>');
+            pos.forEach((x,i) => h += '<div class="bell" id="b'+i+'" style="left:'+x.x+'%;top:'+x.y+'%" onclick="clickBell('+i+')">🔔</div>');
+            return h + '</div>';
+        }
+        
+        function clickBell(i) {
+            const b = document.getElementById('b' + i);
+            if (b.classList.contains('found')) return;
+            
+            b.classList.add('found');
+            bellCount++;
+            
+            const c = document.createElement('div');
+            c.className = 'circle';
+            c.style.left = b.style.left;
+            c.style.top = b.style.top;
+            c.style.transform = 'translate(-50%,-50%)';
+            b.parentElement.appendChild(c);
+            
+            document.getElementById('bc').textContent = '🔔 ' + bellCount + '/5';
+            
+            if (bellCount === 5) {
+                setTimeout(() => {
+                    const m = document.createElement('div');
+                    m.className = 'msg';
+                    m.textContent = '🎉 ¡Los encontraste! 🎉';
+                    b.parentElement.appendChild(m);
+                    setTimeout(() => next(), 2000);
+                }, 500);
+            }
+        }
+        
+        function makePuzzleGame() {
+            const pcs = [{id:1,e:'🔔'},{id:2,e:'⭐'},{id:3,e:'✨'},{id:4,e:'🎵'}];
+            let h = '<div class="text" style="font-size:1.3em">Toca en orden: 1️⃣ 2️⃣ 3️⃣ 4️⃣</div><div class="puzzle">';
+            pcs.forEach(p => h += '<div class="piece" id="p'+p.id+'" onclick="clickPuzzle('+p.id+')"><div class="num">'+p.id+'</div>'+p.e+'</div>');
+            return h + '</div>';
+        }
+        
+        function clickPuzzle(i) {
+            const p = document.getElementById('p' + i);
+            if (p.classList.contains('ok')) return;
+            
+            if (i === puzzleCount + 1) {
+                p.classList.add('o
