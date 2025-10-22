@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aventura Mágica — Versión Cine</title>
+<meta name="theme-color" content="#7e22ce"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--w:980px;--h:440px;--radius:28px}
+  body{
+    font-family:"Comic Sans MS", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,#1e3c72 0%,#2a5298 50%,#7e22ce 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#0f172a
+  }
+  .card{width:100%;max-width:var(--w);background:#fff;border-radius:var(--radius);box-shadow:0 25px 70px rgba(0,0,0,.4);padding:28px;position:relative;overflow:hidden}
+  .snow-top{position:absolute;left:0;right:0;top:0;height:26px;background:linear-gradient(180deg,#fff,transparent);border-radius:var(--radius) var(--radius) 0 0}
+  h1.title{font-size:2.2rem;text-align:center;color:#dc2626;text-shadow:0 3px 8px rgba(0,0,0,.2)}
+  h2.subtitle{font-size:1.1rem;text-align:center;color:#15803d;font-weight:800;margin-top:4px}
+  .panel{display:flex;flex-direction:column;gap:10px;align-items:center;margin:14px 0}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+  .btn{border:none;border-radius:999px;padding:10px 18px;font-weight:800;cursor:pointer;color:#fff}
+  .btn.green{background:linear-gradient(135deg,#15803d,#16a34a)}
+  .btn.gray{background:linear-gradient(135deg,#475569,#334155)}
+  .select,.check{border:2px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-weight:600}
+  .page{margin-top:8px;text-align:center;color:#7c3aed;font-weight:900}
+  /* Escena */
+  .scene{height:var(--h);border-radius:20px;border:5px solid #fbbf24;position:relative;overflow:hidden;margin:12px 0}
+  .ken{position:absolute;inset:0;animation:ken 14s ease-in-out infinite alternate;transform-origin:center}
+  .scene>img{position:absolute;inset:0;min-width:100%;min-height:100%;object-fit:cover;filter:contrast(1.05) saturate(1.05)}
+  @keyframes ken{from{transform:scale(1.05)}to{transform:scale(1.12) translateY(-10px)}}
+  /* Texto 6 líneas */
+  .text{margin-top:10px;font-size:1.18rem;line-height:1.85;font-weight:500;text-align:center}
+  .clamp{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+  .highlight{color:#dc2626;font-weight:800}.magic{color:#7c3aed;font-weight:800}
+  /* Nav */
+  .nav{display:flex;gap:12px;justify-content:center;margin-top:14px}
+  .nav .btn{padding:14px 26px;border-radius:16px}
+  .btn.next{background:linear-gradient(135deg,#dc2626,#ef4444)}.btn.prev{background:linear-gradient(135deg,#0284c7,#0ea5e9)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  /* Elección */
+  .choices{display:flex;flex-direction:column;gap:14px;max-width:600px;margin:14px auto 0}
+  .choice{border:none;border-radius:18px;padding:18px;font-size:1.08rem;color:#fff;font-weight:900;cursor:pointer}
+  .choice.a{background:linear-gradient(135deg,#f59e0b,#f97316)}.choice.b{background:linear-gradient(135deg,#10b981,#059669)}
+  /* Juego A (find bells) */
+  .find-wrap{position:relative;height:var(--h);border-radius:20px;overflow:hidden;border:4px solid #fecaca}
+  .find-wrap img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .bell{position:absolute;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.001}
+  .bell.found{opacity:1;animation:pop .35s ease-out forwards}
+  @keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+  .ring{position:absolute;border:3px solid #ef4444;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);animation:ring .45s ease-out forwards}
+  @keyframes ring{from{transform:translate(-50%,-50%) scale(.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+  .status{margin-top:8px;font-weight:900;color:#0f766e}
+  /* Juego B (puzzle) */
+  .puz{--cols:3;--rows:2;--gap:8px;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:var(--gap);max-width:760px;margin:0 auto}
+  .tile{aspect-ratio:1.5;border-radius:12px;border:3px solid #fde68a;background:#fff;position:relative;cursor:pointer;overflow:hidden}
+  .tile .piece{position:absolute;inset:0;background-size:300% 200%;background-position:0 0}
+  .ok{outline:3px solid #86efac}
+  .hint{margin-top:8px;color:#334155}
+  /* Intro splash */
+  .splash{position:fixed;inset:0;background:#0b1220;color:#fff;display:flex;align-items:center;justify-content:center;z-index:9999}
+  .splash .box{text-align:center;animation:fadeIn 800ms ease forwards}
+  .logo{font-size:3rem;margin-bottom:10px}
+  .prod{opacity:.85}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:720px){:root{--h:320px} h1.title{font-size:1.9rem} .text{font-size:1.05rem}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="snow-top"></div>
+  <h1 class="title" id="title">🎄 La Aventura Mágica 🎄</h1>
+  <h2 class="subtitle" id="subtitle">de <span class="highlight">Darek</span> y <span class="highlight">Conan</span></h2>
+
+  <!-- Panel (solo se muestra en página 1) -->
+  <div class="panel" id="controls"></div>
+
+  <div class="page" id="pager">📖 Página 1 / 15</div>
+
+  <!-- Escena estática (páginas normales) -->
+  <div class="scene" id="scene">
+    <div class="ken"><img id="sceneImg" alt=""/></div>
+  </div>
+
+  <!-- Contenedor dinámico (texto / elección / juegos / nav) -->
+  <div id="content"></div>
+</div>
+
+<!-- Intro Splash -->
+<div class="splash" id="splash">
+  <div class="box">
+    <div class="logo">🎬</div>
+    <h2>Una producción de <strong>Darek Studios</strong></h2>
+    <p class="prod">Presenta: <em>La Aventura Mágica — Versión Cine</em></p>
+  </div>
+</div>
+
+<script>
+/* ====== Estado ====== */
+const S = {
+  pg: Number(localStorage.getItem('pg') ?? 1),
+  path: localStorage.getItem('path') || null,
+  lang: localStorage.getItem('lang') || 'es-ES',
+  voiceOn: JSON.parse(localStorage.getItem('voiceEnabled') ?? 'true'),
+  voiceURI: localStorage.getItem('voiceURI') || '',
+  tone: localStorage.getItem('tone') || 'narrador',
+  autoNarrate: JSON.parse(localStorage.getItem('autoNarrate') ?? 'true'),
+  autoAdvance: JSON.parse(localStorage.getItem('autoAdvance') ?? 'true'),
+  gameA_done: JSON.parse(localStorage.getItem('gameA_done') ?? 'false'),
+  gameB_done: JSON.parse(localStorage.getItem('gameB_done') ?? 'false')
+};
+function save(){ localStorage.setItem('pg',S.pg); localStorage.setItem('path',S.path??''); localStorage.setItem('lang',S.lang); localStorage.setItem('voiceEnabled',JSON.stringify(S.voiceOn)); localStorage.setItem('voiceURI',S.voiceURI); localStorage.setItem('tone',S.tone); localStorage.setItem('autoNarrate',JSON.stringify(S.autoNarrate)); localStorage.setItem('autoAdvance',JSON.stringify(S.autoAdvance)); localStorage.setItem('gameA_done',JSON.stringify(S.gameA_done)); localStorage.setItem('gameB_done',JSON.stringify(S.gameB_done)); }
+
+/* ====== Textos (6 líneas aprox.) ====== */
+const T = {
+  es: {
+    title:"🎄 La Aventura Mágica 🎄",
+    subtitle:"de <span class='highlight'>Darek</span> y <span class='highlight'>Conan</span>",
+    ui:{listen:"🔊 Escuchar", narrating:"🔊 Narrando...", voiceOn:"🔈 Voz: ON", voiceOff:"🔇 Voz: OFF", test:"▶️ Probar voz", tone:"Tono:", lang:"Idioma:", voice:"Voz:", autoN:"Auto narrar", autoA:"Auto avanzar", back:"Atrás", next:"Siguiente ➡️", restart:"Volver a empezar", a:"Buscar los cascabeles", b:"Hacer cascabeles", bells:"Cascabeles", done:"¡Excelente! ¡Todos encontrados!", puzzleDone:"¡Puzzle completado!"},
+    pages:{
+      1:"Nochebuena. <span class='highlight'>Darek</span> (3 años) y su perrito <span class='highlight'>Conan</span> miran el cielo desde la ventana. La casa huele a galletas y las luces del árbol parpadean. Darek sueña con nuevos amigos y aventuras. De pronto, un destello atraviesa la noche y un coche rojo de juguete vibra sobre la mesa…",
+      2:"El cochecito late como un corazón. Una voz amable susurra: “¡Piloto, tenemos una <span class='magic'>misión</span>!”. Conan mueve la cola y salta al asiento de copiloto. La ventana se llena de brillo; la ciudad se hace pequeña mientras ascienden sobre nubes de algodón.",
+      3:"En el cielo, los caminos de luz dibujan constelaciones. Darek sujeta fuerte a Conan. Un copo travieso le hace cosquillas en la nariz. El coche se inclina y traza un lazo brillante. “¿A dónde vamos?”, pregunta Darek. “Al Norte —responde la voz—. Al hogar de la magia.”",
+      4:"La aurora baila como un pañuelo. A lo lejos aparecen tejados blancos y chimeneas humeantes. Bajo el capó, los Hot Wheels de Darek <span class='magic'>brillan</span> dorados, como si recordaran viejas carreras por estrellas.",
+      5:"Aterrizan junto a un taller rojizo. ¡Duendes! El aire sabe a chocolate caliente. Conan olfatea campanillas colgadas en una puerta. “Papá Noel os espera”, dice un duende con guiño chispeante.",
+      6:"Papá Noel suspira. “Se han perdido los <span class='magic'>cascabeles mágicos</span>. Sin ellos, mis renos no pueden volar.” Darek traga saliva y mira a Conan. “Podemos ayudar”, dice con voz valiente.",
+      7:"Dos caminos se abren como páginas: <b>Buscar</b> los cascabeles por el pueblo nevado, o <b>Hacer</b> nuevos en el taller. Darek respira hondo; Conan ladra como diciendo: “¡Elige!”."
+    }
+  },
+  en: {
+    title:"🎄 The Magic Adventure 🎄",
+    subtitle:"by <span class='highlight'>Darek</span> and <span class='highlight'>Conan</span>",
+    ui:{listen:"🔊 Read", narrating:"🔊 Narrating...", voiceOn:"🔈 Voice: ON", voiceOff:"🔇 Voice: OFF", test:"▶️ Test voice", tone:"Tone:", lang:"Language:", voice:"Voice:", autoN:"Auto narrate", autoA:"Auto advance", back:"Back", next:"Next ➡️", restart:"Restart", a:"Search for the bells", b:"Make new bells", bells:"Bells", done:"Great! All found!", puzzleDone:"Puzzle completed!"},
+    pages:{
+      1:"Christmas Eve. <span class='highlight'>Darek</span> (3) and his pup <span class='highlight'>Conan</span> watch the stars from the window. Home smells like cookies and the tree lights twinkle. Darek dreams of new friends and adventures. Suddenly, a streak cuts the night and a tiny red car trembles on the table…",
+      2:"The toy car beats like a heart. A gentle voice whispers: “Pilot, we have a <span class='magic'>mission</span>!”. Conan wags and jumps into the co-pilot seat. The window floods with sparkle; the city shrinks as they rise above cotton clouds.",
+      3:"In the sky, light paths sketch constellations. Darek holds Conan tight. A playful snowflake tickles his nose. The car loops a bright ribbon. “Where are we going?”, he asks. “North —says the voice— to the home of magic.”",
+      4:"The aurora dances like silk. Far away, white rooftops and smoking chimneys appear. Under the hood, Darek’s Hot Wheels <span class='magic'>glow</span> gold, as if remembering old star races.",
+      5:"They land by a red workshop. Elves! The air tastes like hot chocolate. Conan sniffs tiny chimes hanging on a door. “Santa is waiting,” an elf winks.",
+      6:"Santa sighs. “The <span class='magic'>magic bells</span> are missing. Without them, my reindeer can’t fly.” Darek swallows and looks at Conan. “We can help,” he says bravely.",
+      7:"Two paths open like pages: <b>Search</b> the snowy village for the bells, or <b>Make</b> new ones in the workshop. Darek breathes in; Conan barks: “Choose!”"
+    }
+  }
+};
+/* Imagen por página */
+const IMG = {
+  common:{
+    1:'images/p1_home.jpg',2:'images/p2_tree.jpg',3:'images/p3_sky.jpg',
+    4:'images/p4_aurora.jpg',5:'images/p5_workshop.jpg',6:'images/p6_santa.jpg',7:'images/p7_choice.jpg'
+  },
+  A:{8:'images/game_village.jpg',9:'images/a9_bear.jpg',10:'images/a10_cave.jpg',11:'images/a11_bells.jpg',12:'images/a12_reindeer.jpg',13:'images/a13_santa_happy.jpg',14:'images/a14_car_gift.jpg',15:'images/a15_home.jpg'},
+  B:{8:'images/game_village_final.jpg',9:'images/b9_elves.jpg',10:'images/b10_paint.jpg',11:'images/b11_music.jpg',12:'images/b12_reindeer.jpg',13:'images/b13_santa_praise.jpg',14:'images/b14_car_color.jpg',15:'images/b15_home.jpg'}
+};
+
+/* ====== Audio (pon estos archivos en /assets) ====== */
+const SND = {
+  bell: 'assets/bell.mp3',     // al encontrar cascabel
+  applause: 'assets/applause.mp3', // al completar juego A o puzzle
+  click: 'assets/click.mp3',   // toques UI
+  intro: 'assets/intro.mp3'    // música breve splash
+};
+const audioCache = {};
+function play(name, vol=1){
+  const url=SND[name]; if(!url) return;
+  const a = audioCache[name] ? audioCache[name].cloneNode() : new Audio(url);
+  if(!audioCache[name]) audioCache[name]=a;
+  a.volume=vol; a.currentTime=0; a.play().catch(()=>{});
+}
+
+/* ====== Voz (menos robótica) ====== */
+const TONES = {
+  narrador:{rate:0.85,pitch:1.0,volume:1},
+  aventurera:{rate:0.92,pitch:1.15,volume:1},
+  papa_noel:{rate:0.82,pitch:0.95,volume:1}
+};
+function voicesByLang(lang){
+  const vs = speechSynthesis.getVoices();
+  const exact = vs.filter(v => (v.lang||'').toLowerCase().startsWith(lang.toLowerCase()));
+  const subset = vs.filter(v => (v.lang||'').toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
+  return exact.length?exact:(subset.length?subset:vs);
+}
+function pickVoice(){
+  const list=voicesByLang(S.lang); if(!list.length) return null;
+  if(S.voiceURI){ const v=list.find(x=>x.voiceURI===S.voiceURI); if(v) return v; }
+  const hint = S.lang.startsWith('en')? ['google us','en-us','aria','jenny','samantha','english'] : ['google español','español','helena','laura','monica','spanish'];
+  return list.find(v => hint.some(h => (v.name||'').toLowerCase().includes(h))) || list[0];
+}
+function speak(text, tone='narrador', onEnd){
+  if(!S.voiceOn || !('speechSynthesis' in window)) return onEnd&&onEnd();
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  const p=TONES[tone]||TONES.narrador;
+  u.lang=S.lang; u.rate=p.rate; u.pitch=p.pitch; u.volume=p.volume;
+  const v=pickVoice(); if(v) u.voice=v;
+  u.onend=()=>onEnd&&onEnd();
+  u.onerror=()=>onEnd&&onEnd();
+  speechSynthesis.speak(u);
+}
+
+/* ====== Helpers UI ====== */
+function L(){return S.lang.startsWith('en')?'en':'es';}
+function UI(){return T[L()].ui;}
+const $ = sel => document.querySelector(sel);
+
+/* ====== Render cabecera, controles en página 1 ====== */
+function renderHeader(){
+  $('#title').innerHTML = T[L()].title;
+  $('#subtitle').innerHTML = T[L()].subtitle;
+}
+function renderControls(){
+  const c = $('#controls');
+  if(S.pg!==1){ c.innerHTML=''; return; }
+  c.innerHTML = `
+    <div class="row">
+      <button id="bListen" class="btn green">${UI().listen}</button>
+      <button id="bToggle" class="btn gray">${S.voiceOn?UI().voiceOn:UI().voiceOff}</button>
+      <button id="bTest" class="btn green">${UI().test}</button>
+    </div>
+    <div class="row">
+      <label>${UI().tone}</label>
+      <select id="tone" class="select">
+        <option value="narrador">Narrador</option>
+        <option value="aventurera">Aventura</option>
+        <option value="papa_noel">Papá Noel</option>
+      </select>
+      <label>${UI().lang}</label>
+      <select id="lang" class="select">
+        <option value="es-ES">Español</option>
+        <option value="en-US">English</option>
+      </select>
+      <label>${UI().voice}</label>
+      <select id="voice" class="select"><option value="">(Automática)</option></select>
+      <label class="check"><input id="autoN" type="checkbox" ${S.autoNarrate?'checked':''}/> ${UI().autoN}</label>
+      <label class="check"><input id="autoA" type="checkbox" ${S.autoAdvance?'checked':''}/> ${UI().autoA}</label>
+    </div>
+  `;
+  $('#tone').value=S.tone;
+  $('#bListen').onclick = ()=> narrateCurrent();
+  $('#bToggle').onclick = ()=>{ S.voiceOn=!S.voiceOn; save(); renderControls(); };
+  $('#bTest').onclick = ()=> speak(L()==='en'?'This is a warm storyteller voice.':'Esta es una voz de narrador cálido.', S.tone);
+  $('#lang').onchange = (e)=>{ S.lang=e.target.value; S.voiceURI=''; save(); apply(); };
+  $('#voice').onchange = (e)=>{ S.voiceURI=e.target.value; save(); };
+  $('#tone').onchange = (e)=>{ S.tone=e.target.value; save(); };
+  $('#autoN').onchange = (e)=>{ S.autoNarrate=e.target.checked; save(); };
+  $('#autoA').onchange = (e)=>{ S.autoAdvance=e.target.checked; save(); };
+  if('speechSynthesis' in window){
+    const sel=$('#voice'); sel.innerHTML='<option value="">(Automática)</option>';
+    voicesByLang(S.lang).forEach(v=>{ const o=document.createElement('option'); o.value=v.voiceURI; o.textContent=`${v.name} — ${v.lang}`; sel.appendChild(o); });
+    sel.value=S.voiceURI||'';
+    speechSynthesis.onvoiceschanged = ()=>renderControls(); // refrescar si cambian
+  }
+}
+
+/* ====== Data de página ====== */
+function pageData(){
+  if(S.pg<=7){
+    return {img: IMG.common[S.pg], text: T[L()].pages[S.pg], choice: S.pg===7};
+  }
+  const path = (S.path==='A')?'A':'B';
+  const img = (IMG[path]||{})[S.pg] || '';
+  let text = '';
+  if(path==='A'){
+    const lines = [
+      "El pueblo descansa bajo luces y nieve. Tras cada puerta puede latir un cascabel.",
+      "Conan guía atento; Darek escucha un tintineo tímido que se esconde entre faroles.",
+      "Una ventana roja parpadea… ¿será allí?",
+      "Detrás de un banco nevado, algo brilla como estrella pequeña.",
+      "La plaza susurra música de Navidad.",
+      "Solo faltan unos pocos para que la magia regrese."
+    ];
+    text = lines.join(' ');
+  }else{
+    const lines = [
+      "Sobre la mesa del taller, la imagen del pueblo reluce a pedacitos.",
+      "Darek acomoda esquinas; Conan vigila que nada se pierda.",
+      "Los duendes aplauden cada acierto.",
+      "Poco a poco aparece la plaza y las luces se encienden.",
+      "Las campanas parecen cantar desde el papel.",
+      "Cuando todo encaje, la magia volverá."
+    ];
+    text = lines.join(' ');
+  }
+  const finalText = path==='A'
+    ? "¡CASCABELES LISTOS! Los renos alzan el vuelo entre chispas doradas. Papá Noel guiña un ojo; Conan ladra feliz. Darek guarda un Hot Wheels brillante como recuerdo."
+    : "¡CREACIÓN COMPLETA! Las nuevas campanas suenan claras. Los renos saltan al cielo y el taller vibra de alegría. Un coche camaleón cambia de color en manos de Darek.";
+  return {img, text, finalText, game: (S.pg===8)};
+}
+
+/* ====== Render página ====== */
+function loadPage(){
+  renderHeader();
+  $('#pager').textContent = (L()==='en' ? `📖 Page ${S.pg} / 15` : `📖 Página ${S.pg} / 15`);
+  $('#sceneImg').src = (S.pg<=7) ? IMG.common[S.pg] : (S.path==='A'? IMG.A[S.pg] : IMG.B[S.pg]);
+  renderControls();
+
+  const c = $('#content'); c.innerHTML = '';
+  const d = pageData();
+
+  // Texto 6 líneas
+  const txt = document.createElement('div');
+  txt.className = 'text clamp';
+
+  if(S.pg<=7){
+    txt.innerHTML = d.text;
+    c.appendChild(txt);
+    if(d.choice){
+      const choices = document.createElement('div'); choices.className='choices';
+      const ba = document.createElement('button'); ba.className='choice a'; ba.textContent = `🔍 ${UI().a}`; ba.onclick=()=>{ S.path='A'; S.pg=8; save(); loadPage(); };
+      const bb = document.createElement('button'); bb.className='choice b'; bb.textContent = `🎨 ${UI().b}`; bb.onclick=()=>{ S.path='B'; S.pg=8; save(); loadPage(); };
+      choices.append(ba, bb); c.appendChild(choices);
+    } else {
+      c.appendChild(nav());
+    }
+  } else {
+    // Juegos en página 8 según camino
+    if(S.pg===8 && S.path==='A'){
+      c.appendChild(gameFindBells());
+    } else if(S.pg===8 && S.path==='B'){
+      c.appendChild(gamePuzzle());
+    } else if(S.pg===15){
+      txt.textContent = d.finalText; c.appendChild(txt); c.appendChild(nav(true));
+    } else {
+      txt.textContent = d.text; c.appendChild(txt); c.appendChild(nav());
+    }
+  }
+
+  // Auto narrar (si solo hay texto y no juego)
+  if(S.autoNarrate && S.voiceOn){
+    if(!(S.pg===8 && (S.path==='A' || S.path==='B'))){
+      narrateCurrent();
+    }
+  }
+}
+
+function nav(final=false){
+  const wrap=document.createElement('div'); wrap.className='nav';
+  
