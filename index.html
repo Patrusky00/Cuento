@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -47,3 +49,265 @@
     .scene{
       height:var(--scene-h);border-radius:22px;position:relative;overflow:hidden;margin:12px 0;
       box-shadow:inset 0 0 60px rgba(0,0,0,.35);border:5px solid #fbbf24;background:#0b1d36
+    }
+    /* Capa imagen principal con Ken Burns */
+    .scene .img-wrap{
+      position:absolute;inset:0;overflow:hidden;transform-origin:center center;
+      animation:kenburns 14s ease-in-out infinite alternate
+    }
+    .scene img{
+      position:absolute;inset:0;min-width:100%;min-height:100%;object-fit:cover;filter:contrast(1.05) saturate(1.05)
+    }
+    @keyframes kenburns{
+      from{transform:scale(1.05) translate3d(0px,0px,0)}
+      to{transform:scale(1.12) translate3d(0px,-10px,0)}
+    }
+    /* Parallax decor (estrellas/partículas) */
+    .stars, .stars2{
+      pointer-events:none;position:absolute;inset:0;background-repeat:repeat;background-size:contain;opacity:.35
+    }
+    .stars{background-image: radial-gradient(2px 2px at 20% 30%,#fff,transparent), radial-gradient(2px 2px at 60% 70%,#fff,transparent), radial-gradient(2px 2px at 80% 20%,#fff,transparent);}
+    .stars2{background-image: radial-gradient(1px 1px at 10% 80%,#fff,transparent), radial-gradient(1px 1px at 50% 40%,#fff,transparent), radial-gradient(1px 1px at 90% 60%,#fff,transparent);opacity:.25;animation: drift 40s linear infinite}
+    @keyframes drift{from{transform:translateY(0)}to{transform:translateY(-120px)}}
+    /* Nieve canvas encima */
+    canvas.snow{position:absolute;inset:0;pointer-events:none}
+
+    /* Fallback ilustración (si no hay imagen) */
+    .fallback{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px
+    }
+    .float{animation:float 3.6s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .glow{filter:drop-shadow(0 0 14px rgba(255,255,255,.7))}
+
+    .story-text{font-size:1.22em;line-height:1.85;color:#1f2937;margin:14px 0 6px;text-align:center;font-weight:500}
+    .highlight{color:#dc2626;font-weight:800}
+    .magic-word{color:#7c3aed;font-weight:800}
+
+    .navigation{display:flex;gap:14px;margin-top:16px;justify-content:center}
+    .nav-btn{
+      padding:16px 28px;font-size:1.05em;font-weight:800;border:none;border-radius:16px;cursor:pointer;
+      transition:all .25s;font-family:inherit;box-shadow:0 6px 12px rgba(0,0,0,.2);min-width:170px
+    }
+    .nav-btn.next{background:linear-gradient(135deg,#dc2626 0%,#ef4444 100%);color:#fff}
+    .nav-btn.prev{background:linear-gradient(135deg,#0284c7 0%,#0ea5e9 100%);color:#fff}
+    .nav-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.03)}
+    .nav-btn:disabled{opacity:.5;cursor:not-allowed}
+
+    .choices{display:flex;flex-direction:column;gap:14px;margin-top:14px;max-width:600px;margin-inline:auto}
+    .choice-btn{
+      padding:18px;font-size:1.08em;font-weight:800;border:none;border-radius:16px;cursor:pointer;
+      transition:all .25s;font-family:inherit;color:#fff
+    }
+    .choice-btn:nth-child(1){background:linear-gradient(135deg,#f59e0b 0%,#f97316 100%)}
+    .choice-btn:nth-child(2){background:linear-gradient(135deg,#10b981 0%,#059669 100%)}
+    .choice-btn:hover{transform:translateY(-5px)}
+
+    /* Controles de juegos y villancico (igual que tu versión previa) */
+    .village{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:680px;margin:8px auto}
+    .tile{height:62px;border-radius:14px;border:2px dashed rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:30px;background:rgba(255,255,255,.2);cursor:pointer;transition:.15s}
+    .tile.revealed{background:rgba(255,255,255,.88);border-style:solid}
+    .counter-badge{width:56px;height:56px;border-radius:50%;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;margin:2px auto 0;box-shadow:0 6px 12px rgba(0,0,0,.2)}
+    .progress{margin-top:6px;text-align:center;font-weight:800;color:#0f766e}
+
+    .puzzle{display:grid;grid-template-columns:repeat(2,120px);gap:10px;justify-content:center;margin:6px auto}
+    .piece{width:120px;height:120px;border-radius:14px;background:#fff;border:3px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:38px;cursor:pointer;transition:.15s}
+    .piece.correct{background:#f0fdf4;border-color:#86efac}
+    .puzzle-hint{font-size:.95em;color:#334155;text-align:center;margin-top:6px}
+
+    .carol{margin:12px auto;padding:16px;border-radius:16px;border:3px solid #fbbf24;background:linear-gradient(180deg,#fff7ed 0%,#fffbeb 100%);max-width:760px}
+    .carol h3{color:#b45309;text-align:center;margin-bottom:8px}
+    .verses p{margin:8px 0;text-align:center;color:#4b5563}
+    .carol .actions{display:flex;gap:10px;justify-content:center;margin-top:10px}
+    .btn-outline{background:#fff;border:2px solid #ef4444;color:#ef4444}
+
+    @media(max-width:700px){
+      :root{ --scene-h: 320px; }
+      .title{font-size:2em}
+      .story-text{font-size:1.05em}
+      .nav-btn{padding:14px 22px;font-size:1em;min-width:140px}
+    }
+  </style>
+</head>
+<body>
+  <div class="book-container">
+    <div class="snow-top"></div>
+    <h1 class="title" id="title">🎄 La Aventura Mágica 🎄</h1>
+    <h2 class="subtitle" id="subtitle">de <span class="highlight">Darek</span> y <span class="highlight">Conan</span></h2>
+
+    <!-- Controles (bilingüe/voz) -->
+    <div class="panel" id="controls"></div>
+
+    <div class="page-counter" id="page-counter"></div>
+
+    <!-- Escena -->
+    <div class="scene">
+      <div class="img-wrap"><img id="scene-img" alt="" onload="this.dataset.ok=1" onerror="this.dataset.ok=0"/></div>
+      <div class="stars"></div>
+      <div class="stars2"></div>
+      <canvas class="snow" id="snow"></canvas>
+      <div class="fallback" id="fallback"></div>
+    </div>
+
+    <!-- Texto y controles de página/juegos -->
+    <div id="story-container"></div>
+  </div>
+
+  <script>
+    /* ========= Estado & Persistencia ========= */
+    const S = {
+      pg: Number(localStorage.getItem('pg') ?? 1),
+      path: localStorage.getItem('path') || null,
+      voiceOn: JSON.parse(localStorage.getItem('voiceEnabled') ?? 'true'),
+      voiceURI: localStorage.getItem('voiceURI') || '',
+      tone: localStorage.getItem('tone') || 'narrador',
+      lang: localStorage.getItem('lang') || 'es-ES',
+      autoNarrate: JSON.parse(localStorage.getItem('autoNarrate') ?? 'true'),
+      autoAdvance: JSON.parse(localStorage.getItem('autoAdvance') ?? 'true'),
+      gameA_done: JSON.parse(localStorage.getItem('gameA_done') ?? 'false'),
+      gameB_done: JSON.parse(localStorage.getItem('gameB_done') ?? 'false')
+    };
+    let waitingMiniGame=false;
+
+    function save(){
+      localStorage.setItem('pg', S.pg);
+      localStorage.setItem('path', S.path ?? '');
+      localStorage.setItem('voiceEnabled', JSON.stringify(S.voiceOn));
+      localStorage.setItem('voiceURI', S.voiceURI);
+      localStorage.setItem('tone', S.tone);
+      localStorage.setItem('lang', S.lang);
+      localStorage.setItem('autoNarrate', JSON.stringify(S.autoNarrate));
+      localStorage.setItem('autoAdvance', JSON.stringify(S.autoAdvance));
+      localStorage.setItem('gameA_done', JSON.stringify(S.gameA_done));
+      localStorage.setItem('gameB_done', JSON.stringify(S.gameB_done));
+    }
+
+    /* ========= Imágenes por página (pon aquí tus archivos) =========
+       Sube tus imágenes a /images con estos nombres recomendados:
+       - p1_home.jpg, p2_tree.jpg, p3_bark.jpg, p4_hotwheels.jpg, p5_car_fly.jpg, p6_sky.jpg, p7_santa_sad.jpg
+       - p8A_village.jpg, p9A_bear.jpg, p10A_cave_bells.jpg, p11A_bells_magic.jpg, p12A_reindeer.jpg, p13A_santa_happy.jpg, p14A_car_gift.jpg, p15A_home_end.jpg
+       - p8B_workshop.jpg, p9B_elves.jpg, p10B_paint.jpg, p11B_bells_music.jpg, p12B_reindeer.jpg, p13B_santa_praise.jpg, p14B_color_car.jpg, p15B_home_end.jpg
+       Puedes usar .png/.webp/.svg; cambia las extensiones si quieres.
+    ================================================================ */
+    const IMG = {
+      common: {
+        1:'images/p1_home.jpg',
+        2:'images/p2_tree.jpg',
+        3:'images/p3_bark.jpg',
+        4:'images/p4_hotwheels.jpg',
+        5:'images/p5_car_fly.jpg',
+        6:'images/p6_sky.jpg',
+        7:'images/p7_santa_sad.jpg'
+      },
+      A: {
+        8:'images/p8A_village.jpg',
+        9:'images/p9A_bear.jpg',
+        10:'images/p10A_cave_bells.jpg',
+        11:'images/p11A_bells_magic.jpg',
+        12:'images/p12A_reindeer.jpg',
+        13:'images/p13A_santa_happy.jpg',
+        14:'images/p14A_car_gift.jpg',
+        15:'images/p15A_home_end.jpg'
+      },
+      B: {
+        8:'images/p8B_workshop.jpg',
+        9:'images/p9B_elves.jpg',
+        10:'images/p10B_paint.jpg',
+        11:'images/p11B_bells_music.jpg',
+        12:'images/p12B_reindeer.jpg',
+        13:'images/p13B_santa_praise.jpg',
+        14:'images/p14B_color_car.jpg',
+        15:'images/p15B_home_end.jpg'
+      }
+    };
+
+    /* ========= Texto (ampliado) ES/EN ========= */
+    const TEXT = {
+      es: {
+        title: "🎄 La Aventura Mágica 🎄",
+        subtitle: "de <span class='highlight'>Darek</span> y <span class='highlight'>Conan</span>",
+        ui: {
+          listen:"🔊 Escuchar la página", narrating:"🔊 Narrando...", voiceOn:"🔈 Voz: ON", voiceOff:"🔇 Voz: OFF",
+          test:"▶️ Probar voz", toneLabel:"Tono:", langLabel:"Idioma:", voiceLabel:"Voz:", autoNarrate:"Auto narrar", autoAdvance:"Auto avanzar",
+          back:"Atrás", next:"Siguiente ➡️", restart:"Volver a empezar",
+          searchBells:"Buscar los cascabeles perdidos", makeBells:"Hacer cascabeles nuevos",
+          bellsFound:"Cascabeles encontrados", bellsDone:"¡Excelente! Has encontrado todos los cascabeles.",
+          puzzleHint:"Toca las piezas en orden:", puzzleDone:"¡Puzzle completado! Continuemos.",
+          carolBtn:"Escuchar villancico", alreadyBells:"Ya encontraste los cascabeles.", alreadyPuzzle:"Puzzle ya completado."
+        },
+        pages:{
+          1:"Nochebuena. <span class='highlight'>Darek</span> (3 años) y su perrito <span class='highlight'>Conan</span> miran el cielo. Dentro de casa huele a galletas y suena un villancico suave. Darek desea que la Navidad traiga nuevos amigos.",
+          2:"El salón brilla. El árbol reluce y Darek imagina carreras con sus Hot Wheels y risas con sus compañeros del cole nuevo. El corazón le late rápido de ilusión.",
+          3:"Conan ladra mirando la ventana. Un destello cruza el barrio como una estrella fugaz. <span class='magic-word'>Algo</span> mágico llama a la puerta.",
+          4:"Los Hot Wheels empiezan a <span class='magic-word'>brillar</span>. El coche rojo vibra como si tuviera vida propia. Darek lo toma entre manos: está calentito, como si lo invitara a jugar.",
+          5:"Una voz amable susurra: “¡Sube, piloto! Tenemos una <span class='magic-word'>misión</span> navideña”. Conan salta al asiento de copiloto. ¡El coche despega entre luces!",
+          6:"Vuelan sobre nubes de algodón. La ciudad se hace pequeña y el cielo se llena de caminos de luz. Darek aprieta fuerte la mano de Conan.",
+          7:"En el Polo Norte, Papá Noel suspira: “Se han perdido los <span class='magic-word'>cascabeles mágicos</span>. Sin ellos, los renos no pueden volar”. Darek piensa un segundo…"
+        },
+        A:{
+          8:"CAMINO A – Investigar el pueblo nevado. Ayuda a <span class='highlight'>Darek</span> a encontrar <b>6 cascabeles</b> 🔔 escondidos entre casas y faroles.",
+          9:"Un osito polar asoma detrás de un iglú: “¡Seguidme! Oí el tintineo más allá del lago helado”.",
+          10:"En una cueva de hielo, los cascabeles <span class='magic-word'>brillan</span> como constelaciones. Darek los recoge con cuidado.",
+          11:"Al agitarlos: “¡Tilín, tilín!”. La música calienta el aire frío y Conan mueve la cola feliz.",
+          12:"Los renos sienten la melodía. Sus arneses resplandecen. La magia vuelve a las estrellas.",
+          13:"Papá Noel abraza a Darek: “Has sido valiente y generoso. <span class='magic-word'>Gracias</span>”.",
+          14:"Como recuerdo, le entrega un Hot Wheels que reluce en la oscuridad: un faro para nuevas aventuras.",
+          15:"Ya en casa, Darek entiende que la magia vive en compartir. Conan se acurruca. La Navidad ha vuelto a cantar."
+        },
+        B:{
+          8:"CAMINO B – Crear nuevos cascabeles. En el taller, Darek diseña campanas coloridas con purpurina y pegamento especial.",
+          9:"Los duendes le traen pinturas doradas y pequeñas campanillas. Conan vigila que nada se pierda.",
+          10:"Cada cascabel recibe un color <span class='magic-word'>brillante</span> y un deseo: amistad, valor, alegría, imaginación.",
+          11:"Cuando suenan juntos, la música teje magia cálida: “¡Tilín, tilín!”",
+          12:"Los renos prueban los nuevos cascabeles. Vuelan alto, dejando estelas de luz.",
+          13:"“¡Artista!”, dice Papá Noel. “Has salvado la Navidad con creatividad y corazón”.",
+          14:"Darek recibe un coche camaleón que cambia de color con la luz. Un regalo tan <span class='magic-word'>especial</span> como él.",
+          15:"Regresan a casa. Darek promete crear y ayudar siempre que alguien lo necesite."
+        },
+        carolTitle:"🎵 Villancico de Darek y Conan",
+        carolText:`En Nochebuena Darek soñó, con su amigo Conan la estrella siguió.
+Los cascabeles volvieron a brillar, y en el cielo los renos volvieron a volar.
+Con magia y risas la noche acabó: ¡Feliz Navidad!, el corazón cantó.`
+      },
+      en:{
+        title:"🎄 The Magic Adventure 🎄",
+        subtitle:"by <span class='highlight'>Darek</span> and <span class='highlight'>Conan</span>",
+        ui:{
+          listen:"🔊 Read this page", narrating:"🔊 Narrating...", voiceOn:"🔈 Voice: ON", voiceOff:"🔇 Voice: OFF",
+          test:"▶️ Test voice", toneLabel:"Tone:", langLabel:"Language:", voiceLabel:"Voice:", autoNarrate:"Auto narrate", autoAdvance:"Auto advance",
+          back:"Back", next:"Next ➡️", restart:"Restart",
+          searchBells:"Search for the bells", makeBells:"Make new bells",
+          bellsFound:"Bells found", bellsDone:"Great! You found all the bells.",
+          puzzleHint:"Tap pieces in order:", puzzleDone:"Puzzle completed! Let's continue.",
+          carolBtn:"Play carol", alreadyBells:"You already found the bells.", alreadyPuzzle:"Puzzle already completed."
+        },
+        pages:{
+          1:"Christmas Eve. <span class='highlight'>Darek</span> (3) and his little dog <span class='highlight'>Conan</span> gaze at the sky. The home smells like cookies, a carol whispers softly. Darek hopes Christmas brings new friends.",
+          2:"The living room glows. The tree sparkles and Darek imagines Hot Wheels races and laughter with his new classmates. His heart beats with joy.",
+          3:"Conan barks at the window. A streak of light crosses the neighborhood. <span class='magic-word'>Something</span> magical is calling.",
+          4:"The Hot Wheels start to <span class='magic-word'>shine</span>. The red car hums like it’s alive. Darek holds it—warm, inviting him to play.",
+          5:"A kind voice whispers: “Hop in, pilot! We have a Christmas <span class='magic-word'>mission</span>.” Conan jumps to the co-pilot seat. The car lifts off!",
+          6:"They fly above cotton clouds. The city turns tiny while light paths fill the sky. Darek squeezes Conan’s paw.",
+          7:"At the North Pole, Santa sighs: “The <span class='magic-word'>magic bells</span> are missing. Without them, the reindeer can’t fly.” Darek thinks for a moment…"
+        },
+        A:{
+          8:"PATH A – Investigate the snowy village. Help <span class='highlight'>Darek</span> find <b>6 bells</b> 🔔 hidden among houses and lampposts.",
+          9:"A little polar bear peeks from an igloo: “Follow me! I heard jingles beyond the frozen lake.”",
+          10:"Inside an ice cave, the bells <span class='magic-word'>glow</span> like constellations. Darek gathers them gently.",
+          11:"Shaking them: “Ding, ding!” The sound warms the air; Conan wags his tail.",
+          12:"The reindeer feel the melody. Their harnesses shimmer. Magic returns to the stars.",
+          13:"Santa hugs Darek: “You were brave and kind. <span class='magic-word'>Thank you</span>.”",
+          14:"As a keepsake, he offers a glow-in-the-dark Hot Wheels— a beacon for new adventures.",
+          15:"Back home, Darek learns that magic lives in sharing. Conan cuddles close. Christmas sings again."
+        },
+        B:{
+          8:"PATH B – Craft new bells. In the workshop, Darek designs colorful bells with glitter and special glue.",
+          9:"Elves bring golden paint and tiny chimes. Conan ensures nothing gets lost.",
+          10:"Each bell receives a <span class='magic-word'>bright</span> color and a wish: friendship, courage, joy, imagination.",
+          11:"Ringing together, their music weaves warm magic: “Ding, ding!”",
+          12:"Reindeer test the bells and soar, leaving trails of light.",
+          13:"“An <span class='magic-word'>artist</span>,” says Santa. “You saved Christmas with creativity and heart.”",
+          14:"Darek receives a color-changing car. A gift as <span class='magic-word'>special</span> as he is.",
+          15:"They return home. Darek promises to create and help whenever someone needs it."
+        },
+        carolTitle:"🎵 Darek & Conan's Car
